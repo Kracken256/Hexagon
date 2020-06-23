@@ -1,0 +1,339 @@
+
+<html>
+
+<head>
+    <meta name="google-site-verification" content="tnFXMmugpWZk19Lmtx8p0VJEIZMWHFK50l-_idnzaJo" />
+    <title>JShare</title>
+    <link rel="shortcut icon" href="https://img.icons8.com/pastel-glyph/2x/file.png">
+    <meta name="viewport" content="width=725">
+    <style>
+        .owner-tag {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            background: rgba(0, 0, 255, 70%);
+            z-index: 9999;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            color: #fff;
+            font: 17px arial;
+            font-weight: 600;
+        }
+        
+        html {
+            background: #eee;
+            background-image: linear-gradient(30deg, red, orange);
+            overflow: hidden;
+        }
+        
+        .main-nav {
+            background: #fff;
+            box-shadow: 0px 0px 12px #555;
+            padding: 10px;
+            height: 40px;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 10;
+        }
+        
+        .main-nav-search {
+            float: right;
+            padding: 10px;
+            background: #eee;
+            font: Arial 15px;
+            color: #000;
+            border-radius: 0 10px 10px 0;
+            border: 2px solid #00f;
+            position: relative;
+            top: -47.5;
+            left: -220;        }
+        
+        .main-nav-button-submit,
+        .main-nav-button-report {
+            float: right;
+            padding: 10px;
+            background: blue;
+            font: 16px Arial;
+            color: #fff;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            margin-left: 10px;
+        }
+        
+        .main-nav-search-submit-main {
+            float: right;
+            padding: 10px;
+            background: blue;
+            font: 16px Arial;
+            color: #fff;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            margin-left: 10px;
+            margin-right: 50px;
+            position: relative;
+            top: -47.5;
+            left: -220;
+        }
+        
+        .search-lable {
+            float: right;
+            font: 17px arial;
+            padding: 10px;
+            background: blue;
+            position: relative;
+            border-radius: 10px 0 0 10px;
+            color: #fff;
+            position: relative;
+            top: -64.5;
+            left: -220;
+        }
+        
+        .main-nav-search-submit-main:hover {
+            background: orange;
+            border: 2px dashed blue;
+            color: darkblue;
+        }
+        
+        .main-nav-button-submit:hover {
+            background: orange;
+        }
+        
+        .main-nav-button-report:hover {
+            background: red;
+        }
+        
+        .welcome-msg {
+            padding: 0;
+            margin: 0;
+            position: absolute;
+            z-index: -1;
+            font-family: arial;
+        }
+        
+        .content {
+            width: calc(100% - 10px);
+	    height: calc(100% - 70px);
+	    position: absolute;
+            top: 65;
+            overflow-x: hidden;
+        }
+        
+        .upload-form {
+            width: 500px;
+            height: 300px;
+            padding: 20px;
+            background: #444;
+            position: absolute;
+            left: calc(50% - 272.5px);
+            top: calc(50% - 170px);
+            border-radius: 30px;
+        }
+        
+        .upload-file {
+            padding: 10px;
+            background: orange;
+            border-radius: 10px;
+            border: 2px solid blue;
+            margin-left: 25px;
+        }
+        
+        .upload-link {
+            padding: 10px;
+            background: orange;
+            border-radius: 0 10px 10px 0;
+            border: 2px solid blue;
+            margin-left: 25px;
+        }
+        
+        .upload-file-submit {
+            padding: 10px;
+            background: blue;
+            border-radius: 10px;
+            color: orange;
+            font: 18px arial;
+            border: 2px dashed orange;
+            margin-left: 50px;
+        }
+        
+        .upload-link-submit {
+            padding: 8px;
+            background: blue;
+            border-radius: 10px;
+            color: orange;
+            font: 16px arial;
+            border: 2px dashed orange;
+            margin-left: 20px;
+            position: relative;
+            top: 2;
+        }
+        
+        .upload-link-lable {
+            position: relative;
+            left: 25;
+            top: 1;
+            background: blue;
+            color: #fff;
+            font: 17px arial;
+            padding: 10px;
+            border-radius: 10px 0 0 10px;
+        }
+        
+        .upload-file-submit:hover {
+            background: #00ff80;
+            color: black;
+            border: 2px dashed blue;
+        }
+        
+        .upload-link-submit:hover {
+            background: #00ff80;
+            color: black;
+            border: 2px dashed blue;
+        }
+        
+        .upload-file-terms {
+            color: orange;
+            font-family: arial;
+        }
+        
+        .download-file-terms {
+            color: black;
+            font-family: arial;
+            margin: 20px;
+        }
+        
+        .file-display {
+            background: #ddd;
+            width: calc(100% - 26px);
+            height: calc(100% - 35px);
+            padding-top: 10px;
+            font-family: sans-serif;
+            margin-top: 15px;
+            overflow: auto;
+        }
+        
+        .file-display-download {
+            background: #ddd;
+            width: calc(100% - 6px);
+            height: calc(100% - 35px);
+            padding-top: 10px;
+            font-family: sans-serif;
+            margin-top: 15px;
+        }
+        
+        .file-display-frame {
+            background: #ddd;
+            width: calc(100vw - 36px);
+            height: calc(100vh - 110px);
+            padding: 10px;
+            font-family: sans-serif;
+            margin-top: 15px;
+        }
+        
+        .file-display-image {
+            background: #ddd;
+            max-width: calc(100% - 30px);
+            max-height: calc(100% - 45px);
+            padding: 10px;
+            font-family: sans-serif;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            cursor: crosshair;
+        }
+        
+        .file-display-not-found {
+            background: #ddd;
+            width: calc(100vw - 56px);
+            height: calc(100vh - 135px);
+            padding: 10px;
+            font-family: sans-serif;
+        }
+        
+        .download-file-link {
+            padding: 20px;
+            color: blue;
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15;
+            position: absolute;
+            left: 0;
+            top: 5;
+        }
+        
+        .download-file-link:active {
+            color: red;
+        }
+        
+        .list-all-files {
+            background: #ddd;
+            width: calc(100vw - 36px);
+            height: calc(100vh - 110px);
+            padding: 10px;
+            font-family: arial;
+            margin-top: 15px;
+            overflow: auto;
+        }
+        
+        .list-all-files-option {
+            margin: 10px;
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+            position: static;
+            font-weight: 600;
+        }
+        
+        .list-all-files-option-info {
+            margin: 10px 10px 10px 0;
+            color: blue;
+            position: static;
+            font-weight: 600;
+        }
+        
+        @media only screen and (max-width: 815px) {
+            .welcome-msg {
+                display: none;
+            }
+        }    
+    </style>
+</head>
+
+<body>
+    <span style="display:none;">
+        <p>JShare is a website for sharing files, images, links, music and even videos. It is fast free and anonymous. We do not require signup or any info to use any of our services.</p>
+    </span>
+    <span class="owner-tag">
+        Created by: Wesley Jones
+    </span>
+    <div class="main-nav">
+        <span>
+            <h1 class="welcome-msg">JShare</h1>
+        </span>
+                <button class="main-nav-button-submit" onclick="location='/'">Upload File</button>
+        <button class="main-nav-button-submit" onclick="location='?showAll=true'">List All Files</button>
+    </div>
+    <form method="get" class="search-form">
+        <input type="submit" class="main-nav-search-submit-main" value="Search">
+        <input type="text" class="main-nav-search" name="q" value="">
+        <p class="search-lable">Search for a file: </p>
+    </form>
+    </div>
+    <div class="content-overflow">
+        <div class="content">
+                    <div class="upload-form">
+                <form method="post" enctype="multipart/form-data">
+                    <input type="file" name="fileToUpload" id="fileToUpload" class="upload-file" required>
+                    <input type="submit" value="Upload File" name="submit" class="upload-file-submit">
+                </form>
+                <h3 class="upload-file-terms">By uploading a file or link you agree to the following:</h3>
+                <hr>
+                <p class="upload-file-terms">I agree that I will not upload malicious content when using this service. I understand that doing so will violate this agreement and may result in file or link deletion at any time. Additional consequences may apply.</p>
+            </div>
+                </div>
+	</div>
+<div style="text-align: right;position: fixed;z-index:9999999;bottom: 0;width: auto;right: 1%;cursor: pointer;line-height: 0;display:block !important;"><a title="Hosted on free web hosting 000webhost.com. Host your own website for FREE." target="_blank" href="https://www.000webhost.com/?utm_source=000webhostapp&utm_campaign=000_logo&utm_medium=website&utm_content=footer_img"><img src="https://cdn.000webhost.com/000webhost/logo/footer-powered-by-000webhost-white2.png" alt="www.000webhost.com"></a></div><script>function getCookie(t){for(var e=t+"=",n=decodeURIComponent(document.cookie).split(";"),o=0;o<n.length;o++){for(var a=n[o];" "==a.charAt(0);)a=a.substring(1);if(0==a.indexOf(e))return a.substring(e.length,a.length)}return""}getCookie("hostinger")&&(document.cookie="hostinger=;expires=Thu, 01 Jan 1970 00:00:01 GMT;",location.reload());var wordpressAdminBody=document.getElementsByClassName("wp-admin")[0],notification=document.getElementsByClassName("notice notice-success is-dismissible"),hostingerLogo=document.getElementsByClassName("hlogo"),mainContent=document.getElementsByClassName("notice_content")[0],wpSidebar=document.getElementById("adminmenuwrap"),wpTopBarRight=document.getElementById("wp-admin-bar-top-secondary");if(null!=wordpressAdminBody&&notification.length>0&&null!=mainContent){var googleFont=document.createElement("link");googleFontHref=document.createAttribute("href"),googleFontRel=document.createAttribute("rel"),googleFontHref.value="https://fonts.googleapis.com/css?family=Roboto:300,400,600",googleFontRel.value="stylesheet",googleFont.setAttributeNode(googleFontHref),googleFont.setAttributeNode(googleFontRel);var css="@media only screen and (max-width: 576px) {#main_content {max-width: 320px !important;} #main_content h1 {font-size: 30px !important;} #main_content h2 {font-size: 40px !important; margin: 20px 0 !important;} #main_content p {font-size: 14px !important;} #main_content .content-wrapper {text-align: center !important;}} @media only screen and (max-width: 781px) {#main_content {margin: auto; justify-content: center; max-width: 445px;} .upgrade-btn-sidebar {display: none;} #wp-toolbar .top-bar-upgrade-btn {width: 52px; height: 46px !important; padding: 0 !important;} .top-bar-upgrade-btn__text {display: none;} .dashicons-star-filled.top-bar-upgrade-btn__icon::before {font-size: 28px; margin-top: 10px; width: 28px; height: 28px;}} @media only screen and (max-width: 1325px) {.web-hosting-90-off-image-wrapper {position: absolute; max-width: 95% !important;} .notice_content {justify-content: center;} .web-hosting-90-off-image {opacity: 0.3;}} @media only screen and (min-width: 769px) {.notice_content {justify-content: space-between;} #main_content {margin-left: 5%; max-width: 445px;} .web-hosting-90-off-image-wrapper {position: absolute; right: 0; display: flex; padding: 0 5%}} @media only screen and (max-width: 960px) {.upgrade-btn-sidebar {border-radius: 0 !important; padding: 10px 0 !important; margin: 0 !important;} .upgrade-btn-sidebar__icon {display: block !important; margin: auto;} .upgrade-btn-sidebar__text {display: none;}}  .web-hosting-90-off-image {max-width: 90%; margin-top: 20px;} .content-wrapper {z-index: 5} .notice_content {display: flex; align-items: center;} * {-webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;} .upgrade_button_red_sale{box-shadow: 0 2px 12px -6px #cc292f; max-width: 350px; border: 0; border-radius: 3px; background-color: #6747c7 !important; padding: 15px 55px !important;  margin-bottom: 48px; font-size: 14px; font-weight: 800; color: #ffffff;} .upgrade_button_red_sale:hover{color: #ffffff !important; background: rgba(103,71,199, 0.9) !important;} .upgrade-btn-sidebar {text-align:center;background-color:#ff4546;max-width: 350px;border-radius: 3px;border: 0;padding: 12px; margin: 20px 10px;display: block; font-size: 12px;color: #ffffff;font-weight: 700;text-decoration: none;} .upgrade-btn-sidebar:hover, .upgrade-btn-sidebar:focus, .upgrade-btn-sidebar:active {background-color: rgba(255,69,70, 0.9); color: #ffffff;} .upgrade-btn-sidebar__icon {display: none;} .top-bar-upgrade-btn {height: 100% !important; display: inline-block !important; padding: 0 10px !important; color: #ffffff; cursor: pointer;} .top-bar-upgrade-btn:hover, .top-bar-upgrade-btn:active, .top-bar-upgrade-btn:focus {background-color: #ff4546 !important; color: #ffffff !important;} .top-bar-upgrade-btn__icon {margin-right: 6px;}",style=document.createElement("style"),sheet=window.document.styleSheets[0];style.styleSheet?style.styleSheet.cssText=css:style.appendChild(document.createTextNode(css)),document.getElementsByTagName("head")[0].appendChild(style),document.getElementsByTagName("head")[0].appendChild(googleFont);var button=document.getElementsByClassName("upgrade_button_red")[0],link=button.parentElement;link.setAttribute("href","https://www.hostinger.com/hosting-starter-offer?utm_source=000webhost&utm_medium=panel&utm_campaign=000-wp"),link.innerHTML='<button class="upgrade_button_red_sale">Upgrade Now</button>',(notification=notification[0]).setAttribute("style","background-color: #f8f8f8; border-left-color: #6747c7 !important;"),notification.className="notice notice-error is-dismissible";var mainContentHolder=document.getElementById("main_content");mainContentHolder.setAttribute("style","padding: 0;"),hostingerLogo[0].remove();var h1Tag=notification.getElementsByTagName("H1")[0];h1Tag.className="000-h1",h1Tag.innerHTML="Limited Time Offer",h1Tag.setAttribute("style","color: #32454c;  margin-top: 48px; font-size: 48px; font-weight: 700;");var h2Tag=document.createElement("H2");h2Tag.innerHTML="From $0.79/month",h2Tag.setAttribute("style","color: #32454c; margin: 20px 0 45px 0; font-size: 48px; font-weight: 700;"),h1Tag.parentNode.insertBefore(h2Tag,h1Tag.nextSibling);var paragraph=notification.getElementsByTagName("p")[0];paragraph.innerHTML="Don’t miss the opportunity to enjoy up to <strong>4x WordPress Speed, Free SSL and all premium features</strong> available for a fraction of the price!",paragraph.setAttribute("style",'font-family: "Roboto", sans-serif; font-size: 18px; font-weight: 300; color: #6f7c81; margin-bottom: 20px;');var list=notification.getElementsByTagName("UL")[0];list.remove();var org_html=mainContent.innerHTML,new_html='<div class="content-wrapper">'+mainContent.innerHTML+'</div><div class="web-hosting-90-off-image-wrapper"><img class="web-hosting-90-off-image" src="https://cdn.000webhost.com/000webhost/promotions/wp-inject-default-img.png"></div>';mainContent.innerHTML=new_html;var saleImage=mainContent.getElementsByClassName("web-hosting-90-off-image")[0];wpSidebar.insertAdjacentHTML("beforeend",'<a href="https://www.hostinger.com/hosting-starter-offer?utm_source=000webhost&amp;utm_medium=panel&amp;utm_campaign=000-wp-sidebar" target="_blank" class="upgrade-btn-sidebar"><span class="dashicons dashicons-star-filled upgrade-btn-sidebar__icon"></span><span class="upgrade-btn-sidebar__text">Upgrade</span></a>'),wpTopBarRight.insertAdjacentHTML("beforebegin",'<a class="top-bar-upgrade-btn" href="https://www.hostinger.com/hosting-starter-offer?utm_source=000webhost&amp;utm_medium=panel&amp;utm_campaign=000-wp-top-bar" target="_blank"><span class="ab-icon dashicons-before dashicons-star-filled top-bar-upgrade-btn__icon"></span><span class="top-bar-upgrade-btn__text">Go Premium</span></a>')}</script><script type="text/javascript" src="https://a.opmnstr.com/app/js/api.min.js" data-campaign="f6brbmuxflyqoriatchv" data-user="71036" async></script></body>
+<script>
+	var div = document.getElementsByTagName("div")
+	div[div.length-1].remove();
+</script>
+</html>
