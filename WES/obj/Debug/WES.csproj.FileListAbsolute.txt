@@ -1,7 +1,0 @@
-C:\Users\Wesley Jones\source\repos\WES\WES\bin\Debug\WES.exe.config
-C:\Users\Wesley Jones\source\repos\WES\WES\bin\Debug\WES.exe
-C:\Users\Wesley Jones\source\repos\WES\WES\bin\Debug\WES.pdb
-C:\Users\Wesley Jones\source\repos\WES\WES\obj\Debug\WES.csprojAssemblyReference.cache
-C:\Users\Wesley Jones\source\repos\WES\WES\obj\Debug\WES.csproj.CoreCompileInputs.cache
-C:\Users\Wesley Jones\source\repos\WES\WES\obj\Debug\WES.exe
-C:\Users\Wesley Jones\source\repos\WES\WES\obj\Debug\WES.pdb

@@ -1,0 +1,10 @@
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.csprojAssemblyReference.cache
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.Properties.Resources.resources
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.csproj.GenerateResource.cache
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.csproj.CoreCompileInputs.cache
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\bin\Debug\Hexagon.exe.config
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\bin\Debug\Hexagon.exe
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\bin\Debug\Hexagon.pdb
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.Form1.resources
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.exe
+C:\Users\Wesley Jones\source\repos\Hexagon\Hexagon\obj\Debug\Hexagon.pdb
