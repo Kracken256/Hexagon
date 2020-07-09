@@ -86,12 +86,6 @@ namespace Hexagon
                     FileName = file[file.Length - 1];
                     string[] exts = FileName.Split('.');
                     string ext = exts[exts.Length - 1].ToLower();
-                    string[] bin = { "jpg", "png", "gif", "bmp", "tiff", "psd", "mp4", "mkv", "avi", "mov", "mpg", "vob", "mp3", "aac", "wav", "flac", "ogg", "mka", "wma", "pdf", "doc", "xls", "ppt", "docx", "odt", "zip", "rar", "7z", "tar", "iso", "mdb", "accde", "frm", "sqlite", "exe", "dll", "so", "class" };
-                    if (bin.Contains(ext))
-                    {
-                        Editor.Text = BitConverter.ToString(File.ReadAllBytes(FilePath)).Replace("-", " ");
-                        EditorMode = EditorState.Hex;
-                    }
                     switch (ext)
                     {
                         case "cs":
@@ -109,6 +103,19 @@ namespace Hexagon
                         case "html":
                             syntaxType = SyntaxType.XML;
                             break;
+                        default:
+                            syntaxType = SyntaxType.Disabled;
+                            break;
+                    }
+                    string[] bin = { "jpg", "png", "gif", "bmp", "tiff", "psd", "mp4", "mkv", "avi", "mov", "mpg", "vob", "mp3", "aac", "wav", "flac", "ogg", "mka", "wma", "pdf", "doc", "xls", "ppt", "docx", "odt", "zip", "rar", "7z", "tar", "iso", "mdb", "accde", "frm", "sqlite", "exe", "dll", "so", "class" };
+                    if (bin.Contains(ext))
+                    {
+                        Editor.Text = BitConverter.ToString(File.ReadAllBytes(FilePath)).Replace("-", " ");
+                        EditorMode = EditorState.Hex;
+                    }
+                    else
+                    {
+                        Editor.Text = File.ReadAllText(FilePath);
                     }
                     this.Text = "Hexagon - [ " + FileName + " ]";
                 }
