@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Hexagon
@@ -15,18 +17,37 @@ namespace Hexagon
         {
             Text,
             Hex,
-            Binary,
-            Octal
+            Binary
+        }
+        private enum SyntaxType
+        {
+            Disabled,
+            C,
+            XML,
+            CSS,
+            JavaScript,
+            VB
+        }
+        private class SyntaxClass
+        {
+            public MatchCollection Match;
+            public Color Color;
+            public SyntaxClass(MatchCollection match, Color color)
+            {
+                Match = match;
+                Color = color;
+            }
         }
         public string FilePath = "";
         public string FileName = "";
-        private string TextHash = "";
+        private SyntaxType syntaxType = SyntaxType.Disabled;
         private EditorState EditorMode = EditorState.Text;
 
         public Form1()
         {
             InitializeComponent();
         }
+
         public static class Prompt
         {
             public static string ShowDialog(string text, string caption)
@@ -51,6 +72,7 @@ namespace Hexagon
                 return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
             }
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             Editor.Font = new Font(FontFamily.GenericMonospace, Editor.Font.Size);
@@ -62,71 +84,112 @@ namespace Hexagon
                     FilePath = args[1];
                     string[] file = FilePath.Split('\\');
                     FileName = file[file.Length - 1];
-                    string[] extArray = FileName.Split('.');
-                    string ext = extArray[extArray.Length - 1].ToLower();
+                    string[] exts = FileName.Split('.');
+                    string ext = exts[exts.Length - 1].ToLower();
                     string[] bin = { "jpg", "png", "gif", "bmp", "tiff", "psd", "mp4", "mkv", "avi", "mov", "mpg", "vob", "mp3", "aac", "wav", "flac", "ogg", "mka", "wma", "pdf", "doc", "xls", "ppt", "docx", "odt", "zip", "rar", "7z", "tar", "iso", "mdb", "accde", "frm", "sqlite", "exe", "dll", "so", "class" };
                     if (bin.Contains(ext))
                     {
                         Editor.Text = BitConverter.ToString(File.ReadAllBytes(FilePath)).Replace("-", " ");
                         EditorMode = EditorState.Hex;
                     }
-                    else
+                    switch (ext)
                     {
-                        switch (EditorMode)
-                        {
-                            case EditorState.Text:
-                                Editor.Text = File.ReadAllText(FilePath);
-                                break;
-                            case EditorState.Hex:
-                                Editor.Text = BitConverter.ToString(File.ReadAllBytes(FilePath)).Replace("-", " ");
-                                break;
-                            case EditorState.Binary:
-                                Editor.Text = string.Join(" ", File.ReadAllBytes(FilePath).Select(x => Convert.ToString(x, 2).PadLeft(8, '0')));
-                                break;
-                        }
+                        case "cs":
+                        case "cpp":
+                        case "c":
+                            syntaxType = SyntaxType.C;
+                            break;
+                        case "vb":
+                            syntaxType = SyntaxType.VB;
+                            break;
+                        case "js":
+                            syntaxType = SyntaxType.JavaScript;
+                            break;
+                        case "xml":
+                        case "html":
+                            syntaxType = SyntaxType.XML;
+                            break;
                     }
-                    Output.Text = "[ File Loaded ]";
                     this.Text = "Hexagon - [ " + FileName + " ]";
-                    TextHash = SHA256_Compute(Editor.Text);
                 }
             }
-        }
-        private string SHA256_Compute(string str)
-        {
-            SHA256 mySHA256 = SHA256.Create();
-            return BitConverter.ToString(mySHA256.ComputeHash(Encoding.UTF8.GetBytes(str))).Replace("-", "");
         }
 
         private void Editor_TextChanged(object sender, EventArgs e)
         {
-            try
+            List<SyntaxClass> matches = new List<SyntaxClass>();
+            switch (syntaxType)
             {
-                if (TextHash != SHA256_Compute(Editor.Text))
-                {
-                    this.Text = "Hexagon - [ " + FileName + " ] - Not Yet Saved!";
-                }
-                else
-                {
-                    ActiveForm.Text = "Hexagon - [ " + FileName + " ]";
-                }
-                switch (EditorMode)
-                {
-                    case EditorState.Text:
-                        label1.Text = "Word count: " + Editor.Text.Split(' ').Length + ", Char count: " + Editor.Text.Length;
-                        break;
-                    case EditorState.Hex:
-                        label1.Text = "Byte count: " + Editor.Text.Replace(" ", "").Length / 2;
-                        break;
-                    case EditorState.Binary:
-                        int bytes = Editor.Text.Replace(" ", "").Length;
-                        label1.Text = "Byte count: " + bytes / 8 + ", Bit count: " + bytes;
-                        break;
-                }
-            }
-            catch (Exception)
-            {
+                case SyntaxType.C:
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\s?([A-Z][A-Z 0-9 a-z]*)\s\b)"), Color.FromArgb(58, 214, 136)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(Console|null|void|char|int|string|byte|long|float|double|decimal|unsigned|signed|object|Exception)\b"), Color.Cyan));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"[\+\-\*\/\%\=\>\<\&\|\!^]"), Color.Gray));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b([a-z0-9_A-Z]*)\(.*\)"), Color.FromArgb(197, 209, 61)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(var|protected|override|this|enum|public|private|partial|static|namespace|class|using|foreach|in|for|while|new|else|return|if|struct|internal|get|set|switch|case|include)\b"), Color.FromArgb(87, 107, 230)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\/\/.+?$|\/\*.+?\*\/)", RegexOptions.Multiline), Color.Green));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.Brown));
+                    break;
 
+                case SyntaxType.JavaScript:
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(let|var|const|break|case|class|catch|continue|debugger|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)\b"), Color.FromArgb(87, 107, 230)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(undefined, null)\b"), Color.Cyan));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"[\+\-\*\/\%\=\>\<\&\|\!^]"), Color.Gray));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b([a-z0-9_A-Z]*)\(.*\)"), Color.FromArgb(197, 209, 61)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\/\/.+?$|\/\*.+?\*\/)", RegexOptions.Multiline), Color.Green));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.Brown));
+                    break;
+
+                case SyntaxType.CSS:
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z_ @./#&+:()-]*)(\s*)\{"), Color.FromArgb(247, 201, 92)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\s*)([a-z0-9A-Z_@./#&+-]*)\:"), Color.FromArgb(99, 209, 255)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\:(\s*)([a-z0-9A-Z_ @./#&+-]*)"), Color.FromArgb(230, 154, 73)));
+                    break;
+
+                case SyntaxType.XML:
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\<(.*)\>"), Color.FromArgb(60, 109, 214)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\="), Color.FromArgb(99, 209, 255)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"[\=\<\>]"), Color.Gray));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.FromArgb(209, 151, 65)));
+                    break;
+
+                case SyntaxType.VB:
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(Module|Public|Private|Class|As|Integer|End|Sub|Dim|New|Namespace|Imports|)\b"), Color.FromArgb(87, 107, 230)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.Brown));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"[\+\-\*\/\%\=\>\<\&\|\!^]"), Color.Gray));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b([a-z0-9_A-Z]*)\(.*\)"), Color.FromArgb(197, 209, 61)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\'\s?(.*)\n"), Color.Brown));
+                    break;
             }
+
+            int originalIndex = Editor.SelectionStart;
+            int originalLength = Editor.SelectionLength;
+            Color originalColor = Color.White;
+
+            label1.Focus();
+
+            Editor.SelectionStart = 0;
+            Editor.SelectionLength = Editor.Text.Length;
+            Editor.SelectionColor = originalColor;
+
+            foreach (SyntaxClass s in matches)
+            {
+                foreach (Match m in s.Match)
+                {
+                    Editor.SelectionStart = m.Index;
+                    Editor.SelectionLength = m.Length;
+                    Editor.SelectionColor = s.Color;
+                }
+            }
+
+            Editor.SelectionStart = originalIndex;
+            Editor.SelectionLength = originalLength;
+            Editor.SelectionColor = originalColor;
+
+            Editor.Focus();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -163,7 +226,6 @@ namespace Hexagon
                             break;
                     }
                     Form1.ActiveForm.Text = "Hexagon - [ " + FileName + " ]";
-                    Output.Text = "[ File Saved ]";
                 }
             }
             catch (ArgumentException)
@@ -174,7 +236,6 @@ namespace Hexagon
             {
                 MessageBox.Show(ex.Message, "Error:");
             }
-            TextHash = SHA256_Compute(Editor.Text);
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -193,6 +254,24 @@ namespace Hexagon
                 FileName = file[file.Length - 1];
                 string[] extArray = FileName.Split('.');
                 string ext = extArray[extArray.Length - 1].ToLower();
+                switch (ext)
+                {
+                    case "cs":
+                    case "cpp":
+                    case "c":
+                        syntaxType = SyntaxType.C;
+                        break;
+                    case "vb":
+                        syntaxType = SyntaxType.VB;
+                        break;
+                    case "js":
+                        syntaxType = SyntaxType.JavaScript;
+                        break;
+                    case "xml":
+                    case "html":
+                        syntaxType = SyntaxType.XML;
+                        break;
+                }
                 string[] bin = { "jpg", "png", "gif", "bmp", "tiff", "psd", "mp4", "mkv", "avi", "mov", "mpg", "vob", "mp3", "aac", "wav", "flac", "ogg", "mka", "wma", "pdf", "doc", "xls", "ppt", "docx", "odt", "zip", "rar", "7z", "tar", "iso", "mdb", "accde", "frm", "sqlite", "exe", "dll", "so", "class" };
                 if (bin.Contains(ext))
                 {
@@ -214,13 +293,7 @@ namespace Hexagon
                             break;
                     }
                 }
-                Output.Text = "[ File Loaded ]";
                 Form1.ActiveForm.Text = "Hexagon - [ " + FileName + " ]";
-                TextHash = SHA256_Compute(Editor.Text);
-            }
-            else
-            {
-                Output.Text = "[ File Not Loaded ]";
             }
         }
 
@@ -260,7 +333,6 @@ namespace Hexagon
                         break;
 
                 }
-                Output.Text = "[ File Saved ]";
             }
         }
 
@@ -385,18 +457,12 @@ namespace Hexagon
                 string[] file = FilePath.Split('\\');
                 FileName = file[file.Length - 1];
                 File.Create(saveFileDialog1.FileName);
-                Output.Text = "[ File Saved ]";
             }
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Editor.SelectAll();
-        }
-
-        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Editor.Undo();
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -422,31 +488,7 @@ namespace Hexagon
 
         private void findToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string findText = Prompt.ShowDialog("Find Text", "");
-            int index = Editor.Find(findText, RichTextBoxFinds.MatchCase);
-            if (index > 0)
-            {
-                Editor.Select(index, findText.Length);
-            }
-            else
-            {
-                index = Editor.Find(findText);
-                if (index > 0)
-                {
-                    Editor.Select(index, findText.Length);
-                }
-                else
-                {
-                    MessageBox.Show("Could not find that text", "Find Text");
-                }
-            }
-        }
-
-        private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string text = Prompt.ShowDialog("Replace Text", "");
-            string replace = Prompt.ShowDialog("Replace With", "");
-            Editor.Text = Editor.Text.Replace(text, replace);
+            panel1.Show();
         }
 
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -480,8 +522,8 @@ namespace Hexagon
 
         private void whiteOnBlackToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Editor.BackColor = Color.White;
-            Editor.ForeColor = Color.Black;
+            Editor.BackColor = Color.FromArgb(30, 30, 30);
+            Editor.ForeColor = Color.White;
         }
 
         private void redOnBlackToolStripMenuItem_Click(object sender, EventArgs e)
@@ -507,6 +549,118 @@ namespace Hexagon
             Color temp = Editor.BackColor;
             Editor.BackColor = Editor.ForeColor;
             Editor.ForeColor = temp;
+        }
+
+        private void Editor_KeyDown(object sender, KeyEventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.S:
+                        saveToolStripMenuItem1.PerformClick();
+                        break;
+                    case Keys.Z:
+                        redoToolStripMenuItem.PerformClick();
+                        break;
+                    case Keys.Y:
+                        redoToolStripMenuItem.PerformClick();
+                        break;
+                    case Keys.A:
+                        selectAllToolStripMenuItem.PerformClick();
+                        break;
+                    case Keys.R:
+                    case Keys.F:
+                        e.Handled = true;
+                        if (panel1.Visible == true)
+                        {
+                            panel1.Hide();
+                        }
+                        else
+                        {
+                            panel1.Show();
+                        }
+                        break;
+
+                }
+            }
+        }
+
+        private void rodoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Editor.Redo();
+        }
+
+        private void hTMLXMLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.XML;
+            Editor.Text += "";
+        }
+
+        private void cSSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.CSS;
+            Editor.Text += "";
+        }
+
+        private void javaScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.JavaScript;
+            Editor.Text += "";
+        }
+
+        private void cCCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.C;
+            Editor.Text += "";
+        }
+
+        private void visualBasicToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.VB;
+            Editor.Text += "";
+        }
+
+        private void DisabledSyntaxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            syntaxType = SyntaxType.Disabled;
+            Editor.Text += "";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string text = findText.Text;
+                string replace = replaceText.Text;
+                if (text == "")
+                {
+                    return;
+                }
+                Editor.Text = Editor.Text.Replace(text, replace);
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int index = Editor.Find(findText.Text, RichTextBoxFinds.MatchCase);
+            if (index >= 0)
+            {
+                Editor.Select(index, findText.Text.Length);
+            }
+            else
+            {
+                MessageBox.Show("Could not find that text", "Find Text");
+            }
+        }
+
+        private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
