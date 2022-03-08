@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -129,14 +130,15 @@ namespace Hexagon
             {
                 case SyntaxType.C:
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\s?([A-Z][A-Z 0-9 a-z]*)\s\b)"), Color.FromArgb(58, 214, 136)));
-                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(Console|null|void|char|int|string|byte|long|float|double|decimal|unsigned|signed|object|Exception)\b"), Color.Cyan));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"[\+\-\*\/\%\=\>\<\&\|\!^]"), Color.Gray));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b([a-z0-9_A-Z]*)\(.*\)"), Color.FromArgb(197, 209, 61)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b\(.*\)"), Color.White));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"([a-z0-9A-Z]*)\."), Color.FromArgb(33, 173, 98)));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(Console|null|void|char|int|string|byte|long|float|double|decimal|unsigned|signed|object|Exception)\b"), Color.Cyan));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"\b(var|protected|override|this|enum|public|private|partial|static|namespace|class|using|foreach|in|for|while|new|else|return|if|struct|internal|get|set|switch|case|include)\b"), Color.FromArgb(87, 107, 230)));
                     matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, @"(\/\/.+?$|\/\*.+?\*\/)", RegexOptions.Multiline), Color.Green));
-                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.Brown));
+                    matches.Add(new SyntaxClass(Regex.Matches(Editor.Text, "\".+?\""), Color.Tan));
                     break;
 
                 case SyntaxType.JavaScript:
@@ -195,6 +197,8 @@ namespace Hexagon
             Editor.SelectionStart = originalIndex;
             Editor.SelectionLength = originalLength;
             Editor.SelectionColor = originalColor;
+
+            computeChecksum();
 
             Editor.Focus();
         }
@@ -668,6 +672,59 @@ namespace Hexagon
         private void replaceToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+        public static byte[] ConvertHexStringToByteArray(string hexString)
+        {
+            hexString = hexString.Replace(" ", "");
+            if (hexString.Length % 2 != 0)
+            {
+                throw new ArgumentException(String.Format(CultureInfo.InvariantCulture, "The binary key cannot have an odd number of digits: {0}", hexString));
+            }
+
+            byte[] data = new byte[hexString.Length / 2];
+            for (int index = 0; index < data.Length; index++)
+            {
+                string byteValue = hexString.Substring(index * 2, 2);
+                data[index] = byte.Parse(byteValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            }
+
+            return data;
+        }
+
+        private void sHA256ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            sha256Box.Font = new Font(FontFamily.GenericMonospace, sha256TextBox.Font.Size);
+            sha256Box.Visible = !sha256Box.Visible;
+        }
+        private void computeChecksum()
+        {
+            byte[] data;
+            switch (EditorMode)
+            {
+                case EditorState.Text:
+                    data = Encoding.UTF8.GetBytes(Editor.Text);
+                    break;
+                case EditorState.Hex:
+                    data = ConvertHexStringToByteArray(Editor.Text);
+                    break;
+                case EditorState.Binary:
+                    string input = Editor.Text.Replace(" ", "");
+                    int numOfBytes = input.Length / 8;
+                    byte[] byteArray = new byte[numOfBytes];
+                    for (int i = 0; i < numOfBytes; ++i)
+                    {
+                        byteArray[i] = Convert.ToByte(input.Substring(8 * i, 8), 2);
+                    }
+                    data = byteArray;
+                    break;
+                default:
+                    data = new byte[0];
+                    break;
+
+            }
+            var sha = SHA256.Create();
+            string sha256sum = BitConverter.ToString(sha.ComputeHash(data)).Replace("-", "").ToLower();
+            sha256TextBox.Text = sha256sum;
         }
     }
 }
